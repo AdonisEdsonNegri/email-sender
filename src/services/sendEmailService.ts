@@ -1,13 +1,15 @@
 import * as nodemailer from "nodemailer";
+import dotenv from 'dotenv'
+dotenv.config();
 
 export class SendEmailService {
     transporter = nodemailer.createTransport({
-        host: "mail.softclever.com.br",
-        port: 465,
+        host: process.env.EMAIL_HOST,
+        port: parseInt(process.env.EMAIL_PORT || '0'),
         secure: true,
         auth: {
-            user: "esfnetbr",
-            pass: "soft@1973824650",
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
         },
         tls: { rejectUnauthorized: false },
     });
