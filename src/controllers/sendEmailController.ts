@@ -1,25 +1,25 @@
 import { Request, Response } from "express";
+import EmailData from "../dtos/emailData.DTO";
 import { SendEmailService } from "../services/sendEmailService";
 
 export class SendEmailController {
     constructor(private sendEmailService: SendEmailService) {}
 
     handle(request: Request, response: Response) {
-        let to = request.body["to"];
-        let title = request.body["title"];
-        let body = request.body["body"];
-
-        if (!to) {
-            response.json({ erro: "Email de contato não informado" });
-        }
-        if (!title) {
-            response.json({ erro: "Titulo do email não informado" });
-        }
-        if (!body) {
-            response.json({ erro: "Corpo do email não informado" });
+        let emailData
+        try {
+            emailData = new EmailData(request);
+        } catch (error) {
+            if(error instanceof Error){
+                response.json({erro: error.message}).status(400);
+                return;
+            }
         }
 
-        this.sendEmailService.execute(to, title, body);
-        return response.json({result: "Email enviado com sucesso"}).status(200);
+        if(emailData){
+            this.sendEmailService.execute(emailData);
+            response.json({result: "Email enviado com sucesso"}).status(200);
+            return;
+        }
     }
 }
